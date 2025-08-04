@@ -1,0 +1,1 @@
+-record(object_type_def, {object_type :: geql@schema:object_type()}).

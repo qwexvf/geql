@@ -1,0 +1,1 @@
+-record(fragment_spread, {fragment_spread :: geql@ast:fragment_spread_value()}).

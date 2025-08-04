@@ -1,0 +1,10 @@
+name = "core_library_examples"
+version = "1.0.0"
+description = "Examples demonstrating core GeQL GraphQL library functionality"
+
+[dependencies]
+gleam_stdlib = ">= 0.44.0 and < 2.0.0"
+geql = { path = "../../" }
+
+[dev-dependencies]
+gleeunit = ">= 1.0.0 and < 2.0.0"

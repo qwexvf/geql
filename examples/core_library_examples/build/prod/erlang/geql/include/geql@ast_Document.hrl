@@ -1,0 +1,1 @@
+-record(document, {definitions :: list(geql@ast:definition())}).

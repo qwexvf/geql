@@ -1,0 +1,1 @@
+-record(list, {inner :: geql@schema:field_type()}).

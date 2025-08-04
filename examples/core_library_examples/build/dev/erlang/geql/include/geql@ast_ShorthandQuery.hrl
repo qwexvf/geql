@@ -1,0 +1,1 @@
+-record(shorthand_query, {selection_set :: geql@ast:selection_set()}).

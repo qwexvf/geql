@@ -1,0 +1,1 @@
+-record(interface_type_def, {interface_type :: geql@schema:interface_type()}).
