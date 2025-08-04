@@ -21,7 +21,7 @@ pub type SDLToken {
   At
   Pipe
   Amp
-  
+
   // SDL Keywords
   Type
   Interface
@@ -33,18 +33,19 @@ pub type SDLToken {
   Schema
   Extend
   Implements
-  
+
   // SDL Values
   Name(value: String)
   IntValue(value: Int)
   FloatValue(value: Float)
   StringValue(value: String)
   BooleanValue(value: Bool)
-  
+
   // Special
   EOF
   Comment(content: String)
-  Description(content: String) // Triple-quoted descriptions
+  Description(content: String)
+  // Triple-quoted descriptions
 }
 
 pub type Position {
@@ -70,7 +71,9 @@ pub fn new_sdl_lexer(input: String) -> SDLLexerState {
   SDLLexerState(input: input, position: 0, line: 1, column: 1)
 }
 
-pub fn tokenize_sdl(input: String) -> Result(List(SDLTokenWithPosition), SDLLexerError) {
+pub fn tokenize_sdl(
+  input: String,
+) -> Result(List(SDLTokenWithPosition), SDLLexerError) {
   let lexer = new_sdl_lexer(input)
   tokenize_loop(lexer, [])
 }
@@ -102,38 +105,96 @@ pub fn next_sdl_token(
     Ok(char) -> {
       let position = Position(lexer.line, lexer.column)
       case char {
-        "{" -> Ok(#(SDLTokenWithPosition(LeftBrace, position), advance_char(lexer)))
-        "}" -> Ok(#(SDLTokenWithPosition(RightBrace, position), advance_char(lexer)))
-        "(" -> Ok(#(SDLTokenWithPosition(LeftParen, position), advance_char(lexer)))
-        ")" -> Ok(#(SDLTokenWithPosition(RightParen, position), advance_char(lexer)))
-        "[" -> Ok(#(SDLTokenWithPosition(LeftBracket, position), advance_char(lexer)))
-        "]" -> Ok(#(SDLTokenWithPosition(RightBracket, position), advance_char(lexer)))
+        "{" ->
+          Ok(#(SDLTokenWithPosition(LeftBrace, position), advance_char(lexer)))
+        "}" ->
+          Ok(#(SDLTokenWithPosition(RightBrace, position), advance_char(lexer)))
+        "(" ->
+          Ok(#(SDLTokenWithPosition(LeftParen, position), advance_char(lexer)))
+        ")" ->
+          Ok(#(SDLTokenWithPosition(RightParen, position), advance_char(lexer)))
+        "[" ->
+          Ok(#(SDLTokenWithPosition(LeftBracket, position), advance_char(lexer)))
+        "]" ->
+          Ok(#(
+            SDLTokenWithPosition(RightBracket, position),
+            advance_char(lexer),
+          ))
         ":" -> Ok(#(SDLTokenWithPosition(Colon, position), advance_char(lexer)))
         "!" -> Ok(#(SDLTokenWithPosition(Bang, position), advance_char(lexer)))
-        "=" -> Ok(#(SDLTokenWithPosition(Equals, position), advance_char(lexer)))
+        "=" ->
+          Ok(#(SDLTokenWithPosition(Equals, position), advance_char(lexer)))
         "@" -> Ok(#(SDLTokenWithPosition(At, position), advance_char(lexer)))
         "|" -> Ok(#(SDLTokenWithPosition(Pipe, position), advance_char(lexer)))
         "&" -> Ok(#(SDLTokenWithPosition(Amp, position), advance_char(lexer)))
-        
+
         "\"" -> {
           case peek_string(lexer) {
             "\"\"\"" -> read_description(lexer, position)
             _ -> read_string(lexer, position)
           }
         }
-        
+
         "#" -> read_comment(lexer, position)
-        
+
         "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "-" ->
           read_number(lexer, position)
-        
+
         // Names and keywords (including SDL keywords)
-        "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m"
-        | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
-        | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M"
-        | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z"
+        "a"
+        | "b"
+        | "c"
+        | "d"
+        | "e"
+        | "f"
+        | "g"
+        | "h"
+        | "i"
+        | "j"
+        | "k"
+        | "l"
+        | "m"
+        | "n"
+        | "o"
+        | "p"
+        | "q"
+        | "r"
+        | "s"
+        | "t"
+        | "u"
+        | "v"
+        | "w"
+        | "x"
+        | "y"
+        | "z"
+        | "A"
+        | "B"
+        | "C"
+        | "D"
+        | "E"
+        | "F"
+        | "G"
+        | "H"
+        | "I"
+        | "J"
+        | "K"
+        | "L"
+        | "M"
+        | "N"
+        | "O"
+        | "P"
+        | "Q"
+        | "R"
+        | "S"
+        | "T"
+        | "U"
+        | "V"
+        | "W"
+        | "X"
+        | "Y"
+        | "Z"
         | "_" -> read_name_or_keyword(lexer, position)
-        
+
         _ -> Error(UnexpectedCharacter(char, position))
       }
     }
@@ -165,19 +226,22 @@ fn read_name_or_keyword(
     "schema" -> Schema
     "extend" -> Extend
     "implements" -> Implements
-    
+
     // Boolean values
     "true" -> BooleanValue(True)
     "false" -> BooleanValue(False)
-    
+
     // Regular name
     _ -> Name(name)
   }
-  
+
   Ok(#(SDLTokenWithPosition(token, position), new_lexer))
 }
 
-fn read_name_chars(lexer: SDLLexerState, acc: String) -> #(String, SDLLexerState) {
+fn read_name_chars(
+  lexer: SDLLexerState,
+  acc: String,
+) -> #(String, SDLLexerState) {
   case peek_char(lexer) {
     Ok(char) -> {
       case is_name_continue(char) {
@@ -193,7 +257,8 @@ fn read_string(
   lexer: SDLLexerState,
   position: Position,
 ) -> Result(#(SDLTokenWithPosition, SDLLexerState), SDLLexerError) {
-  let lexer = advance_char(lexer) // Skip opening quote
+  let lexer = advance_char(lexer)
+  // Skip opening quote
   case read_string_chars(lexer, "") {
     Ok(#(value, new_lexer)) -> {
       case peek_char(new_lexer) {
@@ -212,13 +277,17 @@ fn read_description(
   lexer: SDLLexerState,
   position: Position,
 ) -> Result(#(SDLTokenWithPosition, SDLLexerState), SDLLexerError) {
-  let lexer = advance_char(advance_char(advance_char(lexer))) // Skip """
+  let lexer = advance_char(advance_char(advance_char(lexer)))
+  // Skip """
   case read_description_chars(lexer, "") {
     Ok(#(content, new_lexer)) -> {
       case peek_string_n(new_lexer, 3) {
         "\"\"\"" -> {
           let final_lexer = advance_char(advance_char(advance_char(new_lexer)))
-          Ok(#(SDLTokenWithPosition(Description(content), position), final_lexer))
+          Ok(#(
+            SDLTokenWithPosition(Description(content), position),
+            final_lexer,
+          ))
         }
         _ -> Error(UnterminatedDescription(position))
       }
@@ -231,7 +300,8 @@ fn read_comment(
   lexer: SDLLexerState,
   position: Position,
 ) -> Result(#(SDLTokenWithPosition, SDLLexerState), SDLLexerError) {
-  let lexer = advance_char(lexer) // Skip #
+  let lexer = advance_char(lexer)
+  // Skip #
   let #(content, new_lexer) = read_comment_chars(lexer, "")
   Ok(#(SDLTokenWithPosition(Comment(content), position), new_lexer))
 }
@@ -244,13 +314,15 @@ fn read_number(
   case string.contains(number_str, ".") {
     True -> {
       case float.parse(number_str) {
-        Ok(value) -> Ok(#(SDLTokenWithPosition(FloatValue(value), position), new_lexer))
+        Ok(value) ->
+          Ok(#(SDLTokenWithPosition(FloatValue(value), position), new_lexer))
         Error(_) -> Error(InvalidNumber(number_str, position))
       }
     }
     False -> {
       case int.parse(number_str) {
-        Ok(value) -> Ok(#(SDLTokenWithPosition(IntValue(value), position), new_lexer))
+        Ok(value) ->
+          Ok(#(SDLTokenWithPosition(IntValue(value), position), new_lexer))
         Error(_) -> Error(InvalidNumber(number_str, position))
       }
     }
@@ -298,10 +370,58 @@ fn is_name_continue(char: String) -> Bool {
 
 fn is_letter(char: String) -> Bool {
   case char {
-    "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m"
-    | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
-    | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M"
-    | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" -> True
+    "a"
+    | "b"
+    | "c"
+    | "d"
+    | "e"
+    | "f"
+    | "g"
+    | "h"
+    | "i"
+    | "j"
+    | "k"
+    | "l"
+    | "m"
+    | "n"
+    | "o"
+    | "p"
+    | "q"
+    | "r"
+    | "s"
+    | "t"
+    | "u"
+    | "v"
+    | "w"
+    | "x"
+    | "y"
+    | "z"
+    | "A"
+    | "B"
+    | "C"
+    | "D"
+    | "E"
+    | "F"
+    | "G"
+    | "H"
+    | "I"
+    | "J"
+    | "K"
+    | "L"
+    | "M"
+    | "N"
+    | "O"
+    | "P"
+    | "Q"
+    | "R"
+    | "S"
+    | "T"
+    | "U"
+    | "V"
+    | "W"
+    | "X"
+    | "Y"
+    | "Z" -> True
     _ -> False
   }
 }
@@ -313,16 +433,23 @@ fn is_digit(char: String) -> Bool {
   }
 }
 
-fn read_string_chars(lexer: SDLLexerState, acc: String) -> Result(#(String, SDLLexerState), Nil) {
+fn read_string_chars(
+  lexer: SDLLexerState,
+  acc: String,
+) -> Result(#(String, SDLLexerState), Nil) {
   case peek_char(lexer) {
     Ok("\"") -> Ok(#(acc, lexer))
-    Ok("\n") -> Error(Nil) // Unterminated string
+    Ok("\n") -> Error(Nil)
+    // Unterminated string
     Ok(char) -> read_string_chars(advance_char(lexer), acc <> char)
     Error(_) -> Error(Nil)
   }
 }
 
-fn read_description_chars(lexer: SDLLexerState, acc: String) -> Result(#(String, SDLLexerState), Nil) {
+fn read_description_chars(
+  lexer: SDLLexerState,
+  acc: String,
+) -> Result(#(String, SDLLexerState), Nil) {
   case peek_string_n(lexer, 3) {
     "\"\"\"" -> Ok(#(acc, lexer))
     _ -> {
@@ -334,7 +461,10 @@ fn read_description_chars(lexer: SDLLexerState, acc: String) -> Result(#(String,
   }
 }
 
-fn read_comment_chars(lexer: SDLLexerState, acc: String) -> #(String, SDLLexerState) {
+fn read_comment_chars(
+  lexer: SDLLexerState,
+  acc: String,
+) -> #(String, SDLLexerState) {
   case peek_char(lexer) {
     Ok("\n") -> #(acc, lexer)
     Ok(char) -> read_comment_chars(advance_char(lexer), acc <> char)
@@ -342,7 +472,10 @@ fn read_comment_chars(lexer: SDLLexerState, acc: String) -> #(String, SDLLexerSt
   }
 }
 
-fn read_number_chars(lexer: SDLLexerState, acc: String) -> #(String, SDLLexerState) {
+fn read_number_chars(
+  lexer: SDLLexerState,
+  acc: String,
+) -> #(String, SDLLexerState) {
   case peek_char(lexer) {
     Ok(char) -> {
       case is_digit(char) || char == "." || char == "-" {

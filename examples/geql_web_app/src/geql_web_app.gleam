@@ -1,22 +1,22 @@
-import gleam/io
-import wisp
-import mist
-import gleam/erlang/process
+import database
+import geql
+import geql/executor
 import gleam/bytes_builder
+import gleam/erlang/process
 import gleam/http/request.{type Request}
 import gleam/http/response.{type Response}
+import gleam/io
 import gleam/json
 import gleam/result
 import gleam/string
-import geql
-import geql/executor
-import database
+import mist
 import schema_builder
+import wisp
 
 /// Main entry point for the GraphQL web application
 pub fn main() {
   io.println("🚀 Starting GeQL Web Application...")
-  
+
   // Initialize database
   case database.setup() {
     Ok(_) -> io.println("✅ Database initialized successfully")
@@ -25,27 +25,30 @@ pub fn main() {
       panic as "Failed to setup database"
     }
   }
-  
+
   // Create GraphQL schema
   let schema = schema_builder.create_schema()
   io.println("✅ GraphQL schema created")
-  
+
   // Start web server
-  let assert Ok(_) = 
+  let assert Ok(_) =
     wisp.mist_handler(handle_request(_, schema), "secret_key")
     |> mist.new
     |> mist.port(8080)
     |> mist.start_http
-  
+
   io.println("🌐 GraphQL server running on http://localhost:8080")
   io.println("📍 GraphQL endpoint: POST /graphql")
   io.println("📍 GraphiQL playground: GET /graphiql")
-  
+
   process.sleep_forever()
 }
 
 /// HTTP request handler
-fn handle_request(req: Request(BitArray), schema: geql.Schema) -> Response(BitArray) {
+fn handle_request(
+  req: Request(BitArray),
+  schema: geql.Schema,
+) -> Response(BitArray) {
   case wisp.path_segments(req) {
     ["graphql"] -> handle_graphql(req, schema)
     ["graphiql"] -> handle_graphiql(req)
@@ -55,33 +58,41 @@ fn handle_request(req: Request(BitArray), schema: geql.Schema) -> Response(BitAr
 }
 
 /// Handle GraphQL queries
-fn handle_graphql(req: Request(BitArray), schema: geql.Schema) -> Response(BitArray) {
+fn handle_graphql(
+  req: Request(BitArray),
+  schema: geql.Schema,
+) -> Response(BitArray) {
   case req.method {
     http.Post -> {
       case wisp.get_query(req) {
         Ok(query_string) -> {
           // Execute GraphQL query
           let result = executor.execute_query(schema, query_string)
-          
+
           // Convert result to JSON response
           let json_response = case result.data {
-            Some(_data) -> json.object([
-              #("data", json.object([
-                #("message", json.string("Query executed successfully"))
-              ])),
-              #("errors", json.null())
-            ])
-            None -> json.object([
-              #("data", json.null()),
-              #("errors", json.array([], json.string))
-            ])
+            Some(_data) ->
+              json.object([
+                #(
+                  "data",
+                  json.object([
+                    #("message", json.string("Query executed successfully")),
+                  ]),
+                ),
+                #("errors", json.null()),
+              ])
+            None ->
+              json.object([
+                #("data", json.null()),
+                #("errors", json.array([], json.string)),
+              ])
           }
-          
+
           response.new(200)
           |> response.set_header("content-type", "application/json")
           |> response.set_body(
             json.to_string_builder(json_response)
-            |> bytes_builder.to_bit_array
+            |> bytes_builder.to_bit_array,
           )
         }
         Error(_) -> wisp.bad_request()
@@ -93,7 +104,8 @@ fn handle_graphql(req: Request(BitArray), schema: geql.Schema) -> Response(BitAr
 
 /// Handle GraphiQL playground
 fn handle_graphiql(_req: Request(BitArray)) -> Response(BitArray) {
-  let html = "
+  let html =
+    "
 <!DOCTYPE html>
 <html>
 <head>
@@ -131,15 +143,18 @@ fn handle_graphiql(_req: Request(BitArray)) -> Response(BitArray) {
 </body>
 </html>
   "
-  
+
   response.new(200)
   |> response.set_header("content-type", "text/html")
-  |> response.set_body(bytes_builder.from_string(html) |> bytes_builder.to_bit_array)
+  |> response.set_body(
+    bytes_builder.from_string(html) |> bytes_builder.to_bit_array,
+  )
 }
 
 /// Handle root endpoint
 fn handle_root(_req: Request(BitArray)) -> Response(BitArray) {
-  let html = "
+  let html =
+    "
 <!DOCTYPE html>
 <html>
 <head>
@@ -166,8 +181,10 @@ fn handle_root(_req: Request(BitArray)) -> Response(BitArray) {
 </body>
 </html>
   "
-  
+
   response.new(200)
   |> response.set_header("content-type", "text/html")
-  |> response.set_body(bytes_builder.from_string(html) |> bytes_builder.to_bit_array)
+  |> response.set_body(
+    bytes_builder.from_string(html) |> bytes_builder.to_bit_array,
+  )
 }

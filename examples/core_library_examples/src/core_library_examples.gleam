@@ -1,15 +1,17 @@
-import gleam/io
-import geql
-import examples
-import example_execution
-import person_example
 import dataloader_example
+import example_execution
+import examples
+import geql
+import gleam/io
+import person_example
 
 /// Demonstrates core GeQL GraphQL library functionality
 pub fn main() -> Nil {
   io.println("=== GeQL Core Library Examples ===")
   io.println("")
-  io.println("This demonstrates the pure GraphQL functionality without any web server or database dependencies.")
+  io.println(
+    "This demonstrates the pure GraphQL functionality without any web server or database dependencies.",
+  )
   io.println("")
 
   // Test basic parsing
@@ -28,7 +30,7 @@ pub fn main() -> Nil {
   // Test core GraphQL functionality
   io.println("🎯 Core GraphQL Library Features:")
   io.println("")
-  
+
   // Test auto-generated schema from types
   io.println("📋 Auto-Generated Schema Example:")
   person_example.run_person_example()
@@ -38,12 +40,12 @@ pub fn main() -> Nil {
   // Test manual schema execution  
   io.println("🔧 Manual Schema Definition Example:")
   example_execution.run_example()
-  
+
   io.println("")
-  
+
   // Test DataLoader functionality
   dataloader_example.run_dataloader_example()
-  
+
   io.println("")
   io.println("🧚‍♀️ Pure GraphQL library demo complete!")
   io.println("")

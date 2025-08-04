@@ -3,10 +3,10 @@ import geql/parser
 import geql/schema
 import gleam/dict.{type Dict}
 import gleam/dynamic.{type Dynamic}
+import gleam/io
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
-import gleam/io
 import gleam/string
 
 pub type ExecutionResult {
@@ -38,11 +38,7 @@ pub type FieldContext {
 }
 
 pub type DebugContext {
-  DebugContext(
-    enabled: Bool,
-    indent_level: Int,
-    step_counter: Int,
-  )
+  DebugContext(enabled: Bool, indent_level: Int, step_counter: Int)
 }
 
 pub fn new_debug_context(enabled: Bool) -> DebugContext {
@@ -71,7 +67,6 @@ fn debug_step(debug: DebugContext, message: String) -> DebugContext {
     False -> debug
   }
 }
-
 
 fn debug_result(debug: DebugContext, message: String) -> DebugContext {
   case debug.enabled {
@@ -421,23 +416,31 @@ fn create_resolver_info() -> Dynamic {
 }
 
 // Debug-enabled execution with tracing
-pub fn execute_query_debug(schema: schema.Schema, query: String) -> ExecutionResult {
+pub fn execute_query_debug(
+  schema: schema.Schema,
+  query: String,
+) -> ExecutionResult {
   let debug = new_debug_context(True)
   let debug = debug_step(debug, "🚀 Starting GraphQL Query Execution")
   let debug = debug_log(debug, "Query: " <> query)
-  
+
   let debug = debug_step(debug, "📝 Parsing Query")
   case parser.parse(query) {
     Ok(document) -> {
       let debug = debug_result(debug, "Parse successful")
-      let debug = debug_log(debug, "Document definitions: " <> int_to_string(list.length(document.definitions)))
-      
+      let debug =
+        debug_log(
+          debug,
+          "Document definitions: "
+            <> int_to_string(list.length(document.definitions)),
+        )
+
       let debug = debug_step(debug, "🎯 Executing Query")
-      
+
       // Use existing execute_query but with debug output
       let debug = debug_log(debug, "Calling standard executor...")
       let result = execute_query(schema, query)
-      
+
       case result.data {
         Some(_) -> {
           let _ = debug_result(debug, "✅ Query executed successfully!")
@@ -445,15 +448,20 @@ pub fn execute_query_debug(schema: schema.Schema, query: String) -> ExecutionRes
         }
         None -> {
           let _ = debug_error(debug, "❌ Query execution failed")
-          let _ = debug_log(debug, "Errors: " <> int_to_string(list.length(result.errors)))
+          let _ =
+            debug_log(
+              debug,
+              "Errors: " <> int_to_string(list.length(result.errors)),
+            )
           Nil
         }
       }
-      
+
       result
     }
     Error(error) -> {
-      let _ = debug_error(debug, "Parse failed: " <> parse_error_to_string(error))
+      let _ =
+        debug_error(debug, "Parse failed: " <> parse_error_to_string(error))
       ExecutionResult(data: None, errors: [
         ValidationError("Parse error: " <> parse_error_to_string(error), []),
       ])
@@ -477,15 +485,10 @@ pub fn execute_query(
   case parser.parse(query) {
     Ok(document) -> {
       // Create a basic execution context with no DataLoaders
-      let execution_context = schema.execution_context(create_string_dynamic("context"))
-      
-      execute(
-        schema_def,
-        document,
-        None,
-        execution_context,
-        dict.new(),
-      )
+      let execution_context =
+        schema.execution_context(create_string_dynamic("context"))
+
+      execute(schema_def, document, None, execution_context, dict.new())
     }
     Error(_parse_error) ->
       ExecutionResult(data: None, errors: [

@@ -218,7 +218,6 @@ fn parse_name_from_parser(
   }
 }
 
-
 fn peek_token(parser: Parser) -> Result(TokenWithPosition, Nil) {
   get_token_at(parser.tokens, parser.position)
 }
@@ -244,7 +243,7 @@ fn get_token_at_helper(
 ) -> Result(TokenWithPosition, Nil) {
   case tokens {
     [] -> Error(Nil)
-    [first, .._rest] if current_index == target_index -> Ok(first)
+    [first, ..] if current_index == target_index -> Ok(first)
     [_, ..rest] -> get_token_at_helper(rest, target_index, current_index + 1)
   }
 }
@@ -264,4 +263,3 @@ fn expect_token(
     Error(_) -> Error(UnexpectedEOF(description))
   }
 }
-

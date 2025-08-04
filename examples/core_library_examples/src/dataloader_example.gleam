@@ -1,14 +1,13 @@
 /// DataLoader example demonstrating batching and caching for efficient data fetching
 /// This solves the N+1 query problem common in GraphQL implementations
-
 import geql/dataloader
-import geql/schema
 import geql/executor
+import geql/schema
 import gleam/dynamic.{type Dynamic}
-import gleam/list
-import gleam/io
 import gleam/int
-import gleam/option.{Some, None}
+import gleam/io
+import gleam/list
+import gleam/option.{None, Some}
 
 // Example data types
 pub type User {
@@ -27,72 +26,98 @@ const users = [
 ]
 
 const posts = [
-  Post("1", "Getting Started with GraphQL", "1", "GraphQL is a query language..."),
+  Post(
+    "1",
+    "Getting Started with GraphQL",
+    "1",
+    "GraphQL is a query language...",
+  ),
   Post("2", "Advanced Gleam Patterns", "1", "Gleam offers powerful features..."),
   Post("3", "Database Design Tips", "2", "When designing schemas..."),
   Post("4", "Web Development Best Practices", "3", "Modern web development..."),
-  Post("5", "Functional Programming Benefits", "2", "Functional programming offers..."),
+  Post(
+    "5",
+    "Functional Programming Benefits",
+    "2",
+    "Functional programming offers...",
+  ),
 ]
 
 /// Batch load function for users - simulates database query
-fn batch_load_users(user_ids: List(Dynamic)) -> Result(List(Result(Dynamic, String)), String) {
-  io.println("🔄 BATCH LOADING USERS: " <> int.to_string(list.length(user_ids)) <> " users")
-  
+fn batch_load_users(
+  user_ids: List(Dynamic),
+) -> Result(List(Result(Dynamic, String)), String) {
+  io.println(
+    "🔄 BATCH LOADING USERS: "
+    <> int.to_string(list.length(user_ids))
+    <> " users",
+  )
+
   // Convert Dynamic user IDs to strings (in practice, use dynamic.string)
   let string_ids = list.map(user_ids, fn(_) { "mock_id" })
-  
+
   // Find users by ID (simulating database lookup)
-  let results = list.map(string_ids, fn(id) {
-    case list.find(users, fn(user) { user.id == id }) {
-      Ok(user) -> Ok(user_to_dynamic(user))
-      Error(_) -> Error("User not found: " <> id)
-    }
-  })
-  
+  let results =
+    list.map(string_ids, fn(id) {
+      case list.find(users, fn(user) { user.id == id }) {
+        Ok(user) -> Ok(user_to_dynamic(user))
+        Error(_) -> Error("User not found: " <> id)
+      }
+    })
+
   Ok(results)
 }
 
 /// Batch load function for posts by author ID - simulates database query
-fn batch_load_posts_by_author(author_ids: List(Dynamic)) -> Result(List(Result(Dynamic, String)), String) {
-  io.println("🔄 BATCH LOADING POSTS: " <> int.to_string(list.length(author_ids)) <> " authors")
-  
+fn batch_load_posts_by_author(
+  author_ids: List(Dynamic),
+) -> Result(List(Result(Dynamic, String)), String) {
+  io.println(
+    "🔄 BATCH LOADING POSTS: "
+    <> int.to_string(list.length(author_ids))
+    <> " authors",
+  )
+
   // Convert Dynamic author IDs to strings
   let string_ids = list.map(author_ids, fn(_) { "mock_author_id" })
-  
+
   // Find posts by author ID (simulating database lookup)
-  let results = list.map(string_ids, fn(author_id) {
-    let author_posts = list.filter(posts, fn(post) { post.author_id == author_id })
-    Ok(posts_to_dynamic(author_posts))
-  })
-  
+  let results =
+    list.map(string_ids, fn(author_id) {
+      let author_posts =
+        list.filter(posts, fn(post) { post.author_id == author_id })
+      Ok(posts_to_dynamic(author_posts))
+    })
+
   Ok(results)
 }
 
 /// Create a schema with DataLoader-backed resolvers
 pub fn create_dataloader_schema() -> schema.Schema {
   // User type with posts field that uses DataLoader
-  let user_type = 
+  let user_type =
     schema.object("User")
     |> schema.description("A user in the system")
     |> schema.field(
       schema.field_def("id", schema.non_null(schema.id_type()))
       |> schema.field_description("User ID")
-      |> schema.resolver(user_id_resolver)
+      |> schema.resolver(user_id_resolver),
     )
     |> schema.field(
       schema.field_def("name", schema.string_type())
       |> schema.field_description("User name")
-      |> schema.resolver(user_name_resolver)
+      |> schema.resolver(user_name_resolver),
     )
     |> schema.field(
       schema.field_def("email", schema.string_type())
       |> schema.field_description("User email")
-      |> schema.resolver(user_email_resolver)
+      |> schema.resolver(user_email_resolver),
     )
     |> schema.field(
       schema.field_def("posts", schema.list_type(schema.named_type("Post")))
       |> schema.field_description("Posts by this user")
-      |> schema.resolver(user_posts_resolver) // Uses DataLoader!
+      |> schema.resolver(user_posts_resolver),
+      // Uses DataLoader!
     )
 
   // Post type
@@ -102,26 +127,27 @@ pub fn create_dataloader_schema() -> schema.Schema {
     |> schema.field(
       schema.field_def("id", schema.non_null(schema.id_type()))
       |> schema.field_description("Post ID")
-      |> schema.resolver(post_id_resolver)
+      |> schema.resolver(post_id_resolver),
     )
     |> schema.field(
       schema.field_def("title", schema.string_type())
       |> schema.field_description("Post title")
-      |> schema.resolver(post_title_resolver)
+      |> schema.resolver(post_title_resolver),
     )
     |> schema.field(
       schema.field_def("author", schema.named_type("User"))
       |> schema.field_description("Post author")
-      |> schema.resolver(post_author_resolver) // Uses DataLoader!
+      |> schema.resolver(post_author_resolver),
+      // Uses DataLoader!
     )
 
   // Query type
-  let query_type = 
+  let query_type =
     schema.object("Query")
     |> schema.field(
       schema.field_def("users", schema.list_type(schema.named_type("User")))
       |> schema.field_description("Get all users")
-      |> schema.resolver(get_users_resolver)
+      |> schema.resolver(get_users_resolver),
     )
 
   schema.schema()
@@ -134,11 +160,11 @@ pub fn create_dataloader_schema() -> schema.Schema {
 pub fn create_execution_context_with_dataloaders() -> schema.ExecutionContext {
   let user_context = create_demo_dynamic("demo_context")
   let base_context = schema.execution_context(user_context)
-  
+
   // Create DataLoaders
   let user_loader = dataloader.new(batch_load_users)
   let posts_loader = dataloader.new(batch_load_posts_by_author)
-  
+
   // Add DataLoaders to context
   base_context
   |> schema.add_data_loader("users", user_loader)
@@ -187,13 +213,14 @@ fn user_posts_resolver(info: schema.ResolverInfo) -> Result(Dynamic, String) {
   case info.parent {
     Some(parent_user) -> {
       let user = dynamic_to_user(parent_user)
-      
+
       // Get the posts DataLoader from context
       case schema.get_data_loader(info.context, "posts_by_author") {
         Ok(posts_loader) -> {
           // Use DataLoader to load posts - this will be batched!
-          let #(_updated_loader, result) = dataloader.load(posts_loader, create_demo_dynamic(user.id))
-          
+          let #(_updated_loader, result) =
+            dataloader.load(posts_loader, create_demo_dynamic(user.id))
+
           // In a real implementation, you'd update the loader in the context
           // and handle async operations properly
           result
@@ -230,12 +257,13 @@ fn post_author_resolver(info: schema.ResolverInfo) -> Result(Dynamic, String) {
   case info.parent {
     Some(parent_post) -> {
       let post = dynamic_to_post(parent_post)
-      
+
       // Get the users DataLoader from context
       case schema.get_data_loader(info.context, "users") {
         Ok(users_loader) -> {
           // Use DataLoader to load user - this will be batched!
-          let #(_updated_loader, result) = dataloader.load(users_loader, create_demo_dynamic(post.author_id))
+          let #(_updated_loader, result) =
+            dataloader.load(users_loader, create_demo_dynamic(post.author_id))
           result
         }
         Error(err) -> Error("DataLoader error: " <> err)
@@ -304,7 +332,8 @@ pub fn run_dataloader_example() -> Nil {
   // With DataLoader, it becomes:
   // - 1 query to get all users
   // - 1 batched query to get posts for all users
-  let query = "
+  let query =
+    "
     {
       users {
         id
@@ -330,7 +359,9 @@ pub fn run_dataloader_example() -> Nil {
           io.println("✅ Query executed successfully with DataLoader batching!")
           io.println("")
           io.println("💡 Key Benefits:")
-          io.println("- Multiple individual loads are batched into single operations")
+          io.println(
+            "- Multiple individual loads are batched into single operations",
+          )
           io.println("- Results are cached to avoid duplicate requests")
           io.println("- Dramatic reduction in database queries")
           io.println("- Better performance and reduced load on data sources")
@@ -340,8 +371,10 @@ pub fn run_dataloader_example() -> Nil {
           case result.errors {
             [first_error, ..] -> {
               case first_error {
-                executor.ValidationError(msg, _) -> io.println("Validation: " <> msg)
-                executor.ResolverError(msg, _) -> io.println("Resolver: " <> msg)
+                executor.ValidationError(msg, _) ->
+                  io.println("Validation: " <> msg)
+                executor.ResolverError(msg, _) ->
+                  io.println("Resolver: " <> msg)
                 executor.TypeError(msg, _) -> io.println("Type: " <> msg)
               }
             }

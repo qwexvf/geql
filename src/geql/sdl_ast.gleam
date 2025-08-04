@@ -203,7 +203,6 @@ pub type SchemaDef {
 }
 
 /// Helper functions for working with SDL AST
-
 /// Get the name of a type definition
 pub fn get_type_name(type_def: TypeDef) -> String {
   case type_def {

@@ -10,22 +10,22 @@ import gleam/io
 pub fn demo_sdl_parsing() -> Nil {
   io.println("=== GeQL SDL Complete Demo ===")
   io.println("")
-  
+
   // Test 1: Basic types
   demo_basic_types()
-  
+
   // Test 2: Complex object with arguments
   demo_complex_object()
-  
+
   // Test 3: Union types
   demo_union_type()
-  
+
   // Test 4: Enum types
   demo_enum_type()
-  
+
   // Test 5: Input types
   demo_input_type()
-  
+
   // Test 6: Error handling
   demo_error_handling()
 }
@@ -33,8 +33,9 @@ pub fn demo_sdl_parsing() -> Nil {
 fn demo_basic_types() -> Nil {
   io.println("📝 Test 1: Basic Types")
   io.println("======================")
-  
-  let schema_sdl = "
+
+  let schema_sdl =
+    "
     scalar DateTime
     
     type User {
@@ -47,10 +48,10 @@ fn demo_basic_types() -> Nil {
       id: ID!
     }
   "
-  
+
   io.println("Input SDL:")
   io.println(schema_sdl)
-  
+
   case sdl_parser.parse_sdl(schema_sdl) {
     Ok(document) -> {
       io.println("✅ Parsing successful!")
@@ -61,15 +62,16 @@ fn demo_basic_types() -> Nil {
       print_parse_error(error)
     }
   }
-  
+
   io.println("")
 }
 
 fn demo_complex_object() -> Nil {
   io.println("📝 Test 2: Complex Object with Arguments")
   io.println("========================================")
-  
-  let schema_sdl = "
+
+  let schema_sdl =
+    "
     type Query {
       user(id: ID!): User
       posts(limit: Int = 10, offset: Int = 0): [Post!]!
@@ -83,10 +85,10 @@ fn demo_complex_object() -> Nil {
       author: User!
     }
   "
-  
+
   io.println("Input SDL:")
   io.println(schema_sdl)
-  
+
   case sdl_parser.parse_sdl(schema_sdl) {
     Ok(document) -> {
       io.println("✅ Complex parsing successful!")
@@ -97,23 +99,24 @@ fn demo_complex_object() -> Nil {
       print_parse_error(error)
     }
   }
-  
+
   io.println("")
 }
 
 fn demo_union_type() -> Nil {
   io.println("📝 Test 3: Union Types")
   io.println("======================")
-  
-  let schema_sdl = "
+
+  let schema_sdl =
+    "
     union SearchResult = User | Post | Comment
     
     union MediaItem = Photo | Video | Audio
   "
-  
+
   io.println("Input SDL:")
   io.println(schema_sdl)
-  
+
   case sdl_parser.parse_sdl(schema_sdl) {
     Ok(document) -> {
       io.println("✅ Union parsing successful!")
@@ -124,15 +127,16 @@ fn demo_union_type() -> Nil {
       print_parse_error(error)
     }
   }
-  
+
   io.println("")
 }
 
 fn demo_enum_type() -> Nil {
   io.println("📝 Test 4: Enum Types")
   io.println("=====================")
-  
-  let schema_sdl = "
+
+  let schema_sdl =
+    "
     enum Status {
       ACTIVE
       INACTIVE
@@ -145,10 +149,10 @@ fn demo_enum_type() -> Nil {
       MODERATOR
     }
   "
-  
+
   io.println("Input SDL:")
   io.println(schema_sdl)
-  
+
   case sdl_parser.parse_sdl(schema_sdl) {
     Ok(document) -> {
       io.println("✅ Enum parsing successful!")
@@ -159,15 +163,16 @@ fn demo_enum_type() -> Nil {
       print_parse_error(error)
     }
   }
-  
+
   io.println("")
 }
 
 fn demo_input_type() -> Nil {
   io.println("📝 Test 5: Input Types")
   io.println("======================")
-  
-  let schema_sdl = "
+
+  let schema_sdl =
+    "
     input CreateUserInput {
       name: String!
       email: String!
@@ -181,10 +186,10 @@ fn demo_input_type() -> Nil {
       email: String
     }
   "
-  
+
   io.println("Input SDL:")
   io.println(schema_sdl)
-  
+
   case sdl_parser.parse_sdl(schema_sdl) {
     Ok(document) -> {
       io.println("✅ Input parsing successful!")
@@ -195,24 +200,25 @@ fn demo_input_type() -> Nil {
       print_parse_error(error)
     }
   }
-  
+
   io.println("")
 }
 
 fn demo_error_handling() -> Nil {
   io.println("📝 Test 6: Error Handling")
   io.println("=========================")
-  
-  let invalid_sdl = "
+
+  let invalid_sdl =
+    "
     type User {
       id: ID!
       name: String
       # Missing closing brace intentionally
   "
-  
+
   io.println("Invalid SDL (missing closing brace):")
   io.println(invalid_sdl)
-  
+
   case sdl_parser.parse_sdl(invalid_sdl) {
     Ok(_) -> {
       io.println("❌ Should have failed but didn't!")
@@ -222,7 +228,7 @@ fn demo_error_handling() -> Nil {
       print_parse_error(error)
     }
   }
-  
+
   io.println("")
   io.println("🎯 SDL Demo Complete!")
 }
@@ -231,7 +237,7 @@ fn print_document_summary(document: sdl_ast.SDLDocument) -> Nil {
   io.println("Document contains:")
   let count = count_definitions(document.definitions, 0)
   io.println("  - " <> count <> " type definitions")
-  
+
   case document.definitions {
     [] -> io.println("  (no definitions)")
     definitions -> {
@@ -240,7 +246,10 @@ fn print_document_summary(document: sdl_ast.SDLDocument) -> Nil {
   }
 }
 
-fn count_definitions(definitions: List(sdl_ast.TypeSystemDefinition), acc: Int) -> String {
+fn count_definitions(
+  definitions: List(sdl_ast.TypeSystemDefinition),
+  acc: Int,
+) -> String {
   case definitions {
     [] -> int_to_string(acc)
     [_, ..rest] -> count_definitions(rest, acc + 1)
@@ -263,7 +272,10 @@ fn int_to_string(value: Int) -> String {
   }
 }
 
-fn print_definition_list(definitions: List(sdl_ast.TypeSystemDefinition), index: Int) -> Nil {
+fn print_definition_list(
+  definitions: List(sdl_ast.TypeSystemDefinition),
+  index: Int,
+) -> Nil {
   case definitions {
     [] -> Nil
     [def, ..rest] -> {
@@ -304,14 +316,24 @@ fn print_parse_error(error: sdl_parser.SDLParseError) -> Nil {
     sdl_parser.UnexpectedToken(expected, got, position) -> {
       io.println("  Expected: " <> expected)
       io.println("  Got: " <> format_token(got))
-      io.println("  At: line " <> int_to_string(position.line) <> ", column " <> int_to_string(position.column))
+      io.println(
+        "  At: line "
+        <> int_to_string(position.line)
+        <> ", column "
+        <> int_to_string(position.column),
+      )
     }
     sdl_parser.UnexpectedEOF(expected) -> {
       io.println("  Unexpected end of file, expected: " <> expected)
     }
     sdl_parser.InvalidTypeDefinition(message, position) -> {
       io.println("  Invalid type definition: " <> message)
-      io.println("  At: line " <> int_to_string(position.line) <> ", column " <> int_to_string(position.column))
+      io.println(
+        "  At: line "
+        <> int_to_string(position.line)
+        <> ", column "
+        <> int_to_string(position.column),
+      )
     }
   }
 }

@@ -1,7 +1,7 @@
+import geql/dataloader.{type DataLoader}
 import gleam/dict.{type Dict}
 import gleam/dynamic.{type Dynamic}
 import gleam/option.{type Option, None, Some}
-import geql/dataloader.{type DataLoader}
 
 // Core schema types
 pub type Schema {
@@ -135,32 +135,30 @@ pub type ResolverInfo {
 
 /// Create a new execution context
 pub fn execution_context(user_context: Dynamic) -> ExecutionContext {
-  ExecutionContext(
-    user_context: user_context,
-    data_loaders: dict.new(),
-  )
+  ExecutionContext(user_context: user_context, data_loaders: dict.new())
 }
 
 /// Add a DataLoader to the execution context
 pub fn add_data_loader(
   context: ExecutionContext,
   name: String,
-  loader: DataLoader(Dynamic, Dynamic)
+  loader: DataLoader(Dynamic, Dynamic),
 ) -> ExecutionContext {
   ExecutionContext(
     ..context,
-    data_loaders: dict.insert(context.data_loaders, name, loader)
+    data_loaders: dict.insert(context.data_loaders, name, loader),
   )
 }
 
 /// Get a DataLoader from the execution context
 pub fn get_data_loader(
   context: ExecutionContext,
-  name: String
+  name: String,
 ) -> Result(DataLoader(Dynamic, Dynamic), String) {
   case dict.get(context.data_loaders, name) {
     Ok(loader) -> Ok(loader)
-    Error(_) -> Error("DataLoader '" <> name <> "' not found in execution context")
+    Error(_) ->
+      Error("DataLoader '" <> name <> "' not found in execution context")
   }
 }
 
@@ -168,11 +166,11 @@ pub fn get_data_loader(
 pub fn update_data_loader(
   context: ExecutionContext,
   name: String,
-  loader: DataLoader(Dynamic, Dynamic)
+  loader: DataLoader(Dynamic, Dynamic),
 ) -> ExecutionContext {
   ExecutionContext(
     ..context,
-    data_loaders: dict.insert(context.data_loaders, name, loader)
+    data_loaders: dict.insert(context.data_loaders, name, loader),
   )
 }
 
