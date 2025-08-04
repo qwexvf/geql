@@ -1,0 +1,1 @@
+-record(labelled_field, {label :: binary(), item :: any()}).

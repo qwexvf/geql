@@ -1,0 +1,5 @@
+-record(enum_value_def, {
+    name :: binary(),
+    description :: gleam@option:option(binary()),
+    directives :: list(geql@sdl_ast:directive_usage())
+}).

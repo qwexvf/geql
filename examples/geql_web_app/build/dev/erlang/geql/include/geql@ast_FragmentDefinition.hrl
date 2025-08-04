@@ -1,0 +1,1 @@
+-record(fragment_definition, {fragment :: geql@ast:fragment()}).

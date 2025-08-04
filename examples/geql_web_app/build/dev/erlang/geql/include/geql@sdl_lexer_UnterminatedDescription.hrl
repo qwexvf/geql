@@ -1,0 +1,1 @@
+-record(unterminated_description, {position :: geql@sdl_lexer:position()}).

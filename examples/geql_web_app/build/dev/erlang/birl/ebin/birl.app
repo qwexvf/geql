@@ -1,0 +1,9 @@
+{application, birl, [
+    {vsn, "1.8.0"},
+    {applications, [gleam_regexp,
+                    gleam_stdlib,
+                    ranger]},
+    {description, "Date / Time handling for Gleam"},
+    {modules, []},
+    {registered, []}
+]}.
