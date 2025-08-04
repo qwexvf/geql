@@ -265,4 +265,4 @@ Consider adding Redis or in-memory caching for frequently accessed data.
 
 ---
 
-This example demonstrates how to build a production-ready GraphQL API with Gleam while keeping the core GraphQL library pure and focused! 🧚‍♀️✨
+This example demonstrates how to build a GraphQL API with Gleam while keeping the core GraphQL library pure and focused! 🧚‍♀️✨

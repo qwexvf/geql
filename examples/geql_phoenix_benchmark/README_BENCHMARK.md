@@ -181,7 +181,7 @@ type Mutation {
 - **Mature Ecosystem**: Extensive tooling and middleware
 - **Built-in Features**: Subscriptions, DataLoader, introspection
 - **Developer Experience**: GraphiQL, detailed error messages
-- **Production Ready**: Battle-tested in production environments
+- **Battle-tested**: Proven in large-scale applications
 
 ### Gleam GeQL Strengths  
 - **Type Safety**: Compile-time guarantees

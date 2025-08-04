@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-GeQL is a production-ready GraphQL library for Gleam that provides parsing, schema definition, and query execution capabilities. The project follows a clean architecture with a pure GraphQL core library and separate database/web integration examples.
+GeQL is a GraphQL library for Gleam that provides parsing, schema definition, and query execution capabilities. The project follows a clean architecture with a pure GraphQL core library and separate database/web integration examples.
 
 ## Commands
 

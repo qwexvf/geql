@@ -83,7 +83,7 @@ Each example should:
 - ✅ Show clear separation of concerns
 - ✅ Include comprehensive documentation
 - ✅ Provide working code that can be run locally
-- ✅ Demonstrate production-ready patterns
+- ✅ Demonstrate clean architecture patterns
 
 ---
 

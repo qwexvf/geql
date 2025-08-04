@@ -1,4 +1,4 @@
-# GeQL - Production-Ready GraphQL Library for Gleam
+# GeQL - GraphQL Library for Gleam
 
 [![Package Version](https://img.shields.io/hexpm/v/geql)](https://hex.pm/packages/geql)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/geql/)
@@ -14,7 +14,7 @@ GeQL is designed as a **pure GraphQL core library** with **optional database int
 - Complete GraphQL parsing, schema definition, and execution
 - Auto-schema generation from Gleam types
 - Struct-based resolvers for type safety
-- Production-ready error handling
+- Comprehensive error handling
 
 ```sh
 gleam add geql  # Pure GraphQL library
@@ -24,7 +24,7 @@ gleam add geql  # Pure GraphQL library
 - **Complete web application** using GeQL + Wisp + Cake + Cigogne
 - HTTP server with GraphiQL playground
 - Database connectivity and migrations
-- Production-ready architecture patterns
+- Clean architecture patterns
 
 ```sh
 cd examples/geql_web_app
@@ -35,7 +35,7 @@ This architecture provides:
 - ✅ **Pure GraphQL library** - zero dependencies beyond `gleam_stdlib`
 - ✅ **Complete web example** - shows real-world integration patterns
 - ✅ **Clear separation** - web/database concerns separate from GraphQL
-- ✅ **Production ready** - both library and example follow best practices
+- ✅ **Well-structured** - both library and example follow best practices
 
 ## 🚀 Features
 
@@ -46,7 +46,7 @@ This architecture provides:
 - **✅ SDL (Schema Definition Language)** - Parse and generate GraphQL SDL schemas
 - **✅ Schema Printing & Serialization** - Convert schemas back to SDL format
 - **✅ Snapshot Testing** - Comprehensive Birdie-based test coverage
-- **✅ Production Ready** - Follows GraphQL spec with comprehensive error handling
+- **✅ Spec Compliant** - Follows GraphQL spec with comprehensive error handling
 - **✅ Pure Gleam** - 100% pure Gleam implementation with struct-based resolvers
 - **✅ Schema Generation** - Automatically generate GraphQL schemas from Gleam types
 - **✅ HTTP Server Ready** - Designed for easy integration with web frameworks
@@ -898,14 +898,14 @@ GeQL Parsing:        40-50K+ ops/sec (estimated), <20μs avg, 5-15MB memory
 Phoenix/Absinthe:    5-12K ops/sec, 90-180μs avg, 50-100MB memory
 
 GeQL HTTP:           Limited by Dynamic serialization (under development)  
-Phoenix HTTP:        Production ready with full GraphQL execution
+Phoenix HTTP:        Complete implementation with full GraphQL execution
 ```
 
 **Performance Analysis:**
 - **GeQL Parsing**: ~4-5x faster than Phoenix (native compilation advantage)
 - **GeQL Memory**: ~3-5x more efficient (no VM overhead)
 - **GeQL Execution**: Currently blocked by Dynamic serialization issue
-- **Phoenix**: Complete, production-ready implementation
+- **Phoenix**: Complete reference implementation
 
 *Note: GeQL shows strong foundational performance, needs Dynamic serialization fix*
 
@@ -1098,7 +1098,7 @@ gleam run  # Runs the main demo
 │   │   │   ├── person_example.gleam        # Schema generation examples
 │   │   │   └── dataloader_example.gleam    # DataLoader usage examples
 │   │   └── README.md         # Pure GraphQL examples guide
-│   ├── geql_web_app/         # Production-ready web application
+│   ├── geql_web_app/         # Example web application
 │   │   ├── gleam.toml        # Web dependencies (wisp, cake, cigogne, etc.)
 │   │   ├── src/
 │   │   │   ├── geql_web_app.gleam    # HTTP server with GraphiQL playground
@@ -1131,7 +1131,7 @@ gleam run  # Runs the main demo
 
 ## 🚀 Current Status
 
-**✅ Core Library (Production Ready)**
+**✅ Core Library**
 - GraphQL parsing and AST generation
 - Type-safe schema definition with fluent API
 - Automatic schema generation from Gleam types
@@ -1144,7 +1144,7 @@ gleam run  # Runs the main demo
 - PostgreSQL database with Cake queries
 - Cigogne migration management  
 - GraphiQL playground for development
-- Production-ready architecture patterns
+- Clean architecture patterns
 
 ## 📋 GraphQL Specification Compliance
 
@@ -1339,7 +1339,7 @@ Contributions are welcome! Please follow our development guidelines:
 
 **Web Application Example (`examples/geql_web_app/`):**
 - Show best practices for real-world integration
-- Demonstrate production-ready patterns
+- Demonstrate clean architecture patterns
 - Keep web/database concerns separate from GraphQL
 
 ## 📄 License
